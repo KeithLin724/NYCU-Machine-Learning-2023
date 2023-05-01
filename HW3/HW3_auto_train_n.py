@@ -127,12 +127,14 @@ class svm_s_model_train_auto:
 
         print(f"\n\nmodel_file_name : {model_file_name}")
 
+        model_file_path = os.path.join(".", model_file_name)
+
         print("Train:")
-        train_p_acc = predict_in_console(".\\" + model_file_name, FILE_TRAIN, TMP_FILE)
+        train_p_acc = predict_in_console(model_file_path, FILE_TRAIN, TMP_FILE)
         print("p_acc: ", train_p_acc)
 
         print("Test:")
-        test_p_acc = predict_in_console(".\\" + model_file_name, FILE_TEST, TMP_FILE)
+        test_p_acc = predict_in_console(model_file_path, FILE_TEST, TMP_FILE)
         print("p_acc: ", test_p_acc)
 
         return train_p_acc, test_p_acc
@@ -217,6 +219,26 @@ class svm_s_model_train_auto:
 
         plt.savefig(os.path.join(folder_path, "svm s test"))
 
+    def model_SV_to_string(self, model_sv_list: list) -> str:
+        """
+        This function converts a list of support vector machine model support vectors to a string format.
+        
+        :param model_sv_list: A list of dictionaries representing the support vectors of a machine learning
+        model. Each dictionary contains the feature index as the key and the corresponding feature value as
+        the value
+        :type model_sv_list: list
+        :return: The function `model_SV_to_string` takes a list of dictionaries as input and returns a
+        string. The string is created by applying the `sv_line_func` function to each dictionary in the
+        input list and joining the resulting strings with newline characters. The `sv_line_func` function
+        converts each dictionary into a string by joining the key-value pairs with colons and the items with
+        spaces.
+        """
+
+        def sv_line_func(sv_item) -> str:
+            return " ".join(":".join(map(str, item)) for item in sv_item.items())
+
+        return "\n".join(sv_line_func(sv_item) for sv_item in model_sv_list)
+
     def save_support_vectors(self, folder_path: str, run_model_dict: dict):
         """
         This function saves the support vectors of a given model in a specified folder path and returns
@@ -236,7 +258,7 @@ class svm_s_model_train_auto:
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-        model_dict_sv = {c: [model.get_sv_indices() for model in models] for c, models in run_model_dict.items()}
+        model_dict_sv = {c: [model.get_SV() for model in models] for c, models in run_model_dict.items()}
         model_dict_sv_len = {c: [len(sv) for sv in sv_len] for c, sv_len in model_dict_sv.items()}
 
         print(model_dict_sv_len)
@@ -269,8 +291,13 @@ class svm_s_model_train_auto:
                 os.makedirs(new_path)
 
             for index, sv in enumerate(sv_list):
-                using_type, sv_np = self.t_mode_str[index], np.array(sv)
-                np.savetxt(os.path.join(new_path, f"svm_n{s:.1f}_{using_type}_support_vector.txt"), sv_np)
+                using_type, sv_str = self.t_mode_str[index], self.model_SV_to_string(model_sv_list=sv)
+
+                save_model_new_path = os.path.join(new_path, f"svm_n{s:.1f}_{using_type}_support_vector.txt")
+
+                # to file
+                with open(save_model_new_path, "w") as f:
+                    f.write(sv_str)
 
         return model_dict_sv
 
