@@ -178,10 +178,10 @@ class svm_s_model_train_auto:
         test_acc_dict = {c: pre[1] for c, pre, in model_predict_dict.items()}
 
         for c, train_acc in train_acc_dict.items():
-            self.df_train.loc[str(c)] = dict(zip(self.t_mode_str, train_acc))
+            self.df_train.loc[f"{c:.1f}"] = dict(zip(self.t_mode_str, train_acc))
 
         for c, test_acc in test_acc_dict.items():
-            self.df_test.loc[str(c)] = dict(zip(self.t_mode_str, test_acc))
+            self.df_test.loc[f"{c:.1f}"] = dict(zip(self.t_mode_str, test_acc))
 
         self.df_train.to_csv(os.path.join(csv_folder_path, f"svm_s_train.csv"))
         self.df_test.to_csv(os.path.join(csv_folder_path, f"svm_s_test.csv"))
@@ -213,7 +213,7 @@ class svm_s_model_train_auto:
         plt.clf()
         df_test.plot.bar(rot=0)
 
-        plt.title("train model different kernel acc")
+        plt.title("test model different kernel acc")
         plt.xlabel("kernel type")
         plt.ylabel("acc")
 
@@ -269,16 +269,13 @@ class svm_s_model_train_auto:
         }
 
         # to df
-        df_model_sv_len = pd.DataFrame()
-        for c, len_dict in model_dict_sv_len.items():
-            df_model_sv_len[c] = len_dict
+        df_model_sv_len = pd.DataFrame.from_dict(model_dict_sv_len, orient='index')
 
         df_model_sv_len.to_csv(os.path.join(folder_path, "support_vector_len.csv"))
 
         # plot
         plt.clf()
-        df_model_sv_len_t = df_model_sv_len.transpose()
-        df_model_sv_len_t.plot.bar(rot=0)
+        df_model_sv_len.plot.bar(rot=0)
 
         plt.title("support vector number")
         plt.xlabel("s number")

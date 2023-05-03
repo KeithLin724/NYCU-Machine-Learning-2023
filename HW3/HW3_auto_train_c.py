@@ -234,16 +234,14 @@ class svm_c_model_train_auto:
         model_dict_sv_len = {str(c): dict(zip(self.t_mode_str, sv_len_list)) for c, sv_len_list in model_dict_sv_len.items()}
 
         # to df
-        df_model_sv_len = pd.DataFrame()
-        for c, len_dict in model_dict_sv_len.items():
-            df_model_sv_len[c] = len_dict
+        df_model_sv_len = pd.DataFrame.from_dict(model_dict_sv_len, orient='index')
 
         df_model_sv_len.to_csv(os.path.join(folder_path, "support_vector_len.csv"))
 
         # plot
         plt.clf()
-        df_model_sv_len_t = df_model_sv_len.transpose()
-        df_model_sv_len_t.plot.bar(rot=0)
+        # df_model_sv_len_t = df_model_sv_len.transpose()
+        df_model_sv_len.plot.bar(rot=0)
 
         plt.title("support vector number")
         plt.xlabel("c number")
