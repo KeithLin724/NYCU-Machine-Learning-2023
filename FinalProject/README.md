@@ -1,11 +1,6 @@
 # Machine Learning Final Project 📰
 ## Written By Group 5 
 
-### Member : :clinking_glasses:
-- 109611039 蔡宜珊
-- 109511276 練鈞揚
-- 110511263 鄭詠駿
-
 
 ---
 
